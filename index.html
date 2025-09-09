@@ -445,6 +445,10 @@
         const data = docSnap.data();
 
         if (data.user !== currentUser) {
+            if(ISADMIN) {
+                await deleteDoc(docRef);
+                return
+            }
             alert("Not your message..");
             return;
         }
