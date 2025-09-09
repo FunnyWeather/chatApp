@@ -221,25 +221,77 @@
         }
       }
     };
+    let chatUnsub = null;
+    let privateUnsub = null;
 
     function enableChat() {
       userDiv.style.display = "block";
       userNameSpan.textContent = "Logged in as: " + currentUser;
-      userNameSpan.style.top = "20px";
-      userNameSpan.style.right = "80px";
       usernameInput.style.display = "none";
       passwordInput.style.display = "none";
       loginBtn.style.display = "none";
       topText.textContent = "";
-      if(currentUser === "Admin")
-      {
+    
+      if (currentUser === "Admin") {
         ISADMIN = true;
       }
+    
       refreshDM();
-
-      console.log(currentUser);
+    
+      // start listeners here
+      if (!chatUnsub) {
+        const chatQuery = query(collection(db, "messages"), orderBy("time"));
+        chatUnsub = onSnapshot(chatQuery, snapshot => {
+          snapshot.docChanges().forEach(change => {
+            const data = change.doc.data();
+            const time = new Date(data.time).toLocaleTimeString();
+    
+            const deleteButton = (data.user === currentUser || ISADMIN) 
+              ? `<button onclick="deleteMessage('${change.doc.id}')">Delete</button>` 
+              : "";
+    
+            if (change.type === "added") {
+              chatDiv.innerHTML += `
+                <div id="msg-${change.doc.id}" class="chat-message" 
+                     style="margin: 5px; padding: 8px; border-radius: 5px; background-color: #555;">
+                  <b>${data.user} | </b> 
+                  <span style="font-size: 0.8em; color: #ccc;">${time} ${deleteButton}</span><br>
+                  ${data.message}<br>
+                </div>
+              `;
+            } else if (change.type === "removed") {
+              const msgDiv = document.getElementById(`msg-${change.doc.id}`);
+              if (msgDiv) msgDiv.remove();
+            }
+          });
+        });
+      }
+    
+      if (!privateUnsub) {
+        const privateQuery = query(collection(db, "private messages"), orderBy("time"));
+        privateUnsub = onSnapshot(privateQuery, snapshot => {
+          privateChat.innerHTML = "";
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const time = new Date(data.time).toLocaleTimeString();
+    
+            const deleteButton = (ISADMIN)
+              ? `<button onclick="deleteDM('${doc.id}')">Delete</button>` 
+              : "";
+    
+            if (currentUser === data.recipient || currentUser === data.user || ISADMIN) {
+              privateChat.innerHTML += `
+                <div style="margin: 5px; padding: 8px; border-radius: 5px; background-color: #555;">
+                  <b>${data.user} --> ${data.recipient} | </b> 
+                  <span style="font-size: 0.8em; color: #ccc;">${time} ${deleteButton}</span><br>
+                  ${data.message}<br>
+                </div>
+              `;
+            }
+          });
+        });
+      }
     }
-
     // Logout
     logoutBtn.onclick = () => {
       currentUser = null;
