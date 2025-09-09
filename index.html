@@ -188,6 +188,7 @@
     const topText = document.getElementById("top-text")
 
     let currentUser = null;
+    let ISADMIN = false;
 
     // Login / Register
     loginBtn.onclick = async () => {
@@ -230,6 +231,10 @@
       passwordInput.style.display = "none";
       loginBtn.style.display = "none";
       topText.textContent = "";
+      if(currentUser === "Admin")
+      {
+        ISADMIN = true;
+      }
       refreshDM();
 
       console.log(currentUser);
@@ -296,7 +301,7 @@
             const data = change.doc.data();
             const time = new Date(data.time).toLocaleTimeString();
 
-            const deleteButton = (data.user === currentUser) 
+            const deleteButton = (data.user === currentUser || ISADMIN) 
                 ? `<button onclick="deleteMessage('${change.doc.id}')">Delete</button>` 
                 : "";
 
@@ -321,7 +326,7 @@
             const data = doc.data();
             const time = new Date(data.time).toLocaleTimeString(); // format timestamp
 
-            const deleteButton = (currentUser === "Admin") 
+            const deleteButton = (ISADMIN)
                 ? `<button onclick="deleteDM('${doc.id}')">Delete</button>` 
                 : "";
 
