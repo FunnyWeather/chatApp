@@ -448,9 +448,10 @@
             if(ISADMIN) {
                 await deleteDoc(docRef);
                 return
+            } else {
+                alert("Not your message..");
+                return;
             }
-            alert("Not your message..");
-            return;
         }
 
         if (confirm("Are you sure you want to delete this message?")) {
