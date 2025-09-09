@@ -346,7 +346,7 @@
     };
 
 
-    // Listen for messages
+    /* Listen for messages
     const chatQuery = query(collection(db, "messages"), orderBy("time"));
     onSnapshot(chatQuery, snapshot => {
         snapshot.docChanges().forEach(change => {
@@ -391,7 +391,7 @@
                   `;
               }
         });
-    });
+    });*/
 
     async function refreshMessages() {
         const chatQuery = query(collection(db, "messages"), orderBy("time"));
