@@ -176,6 +176,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    let ISISAIHAH = false;
+
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logout");
     const userDiv = document.getElementById("userDiv");
@@ -236,6 +238,10 @@
     
       if (currentUser === "Admin") {
         ISADMIN = true;
+      }
+
+      if(currentUser === "Isaiah.") {
+        ISISAIHAH = true
       }
     
       refreshDM();
@@ -319,6 +325,10 @@
       const msg = msgInput.value.trim();
       if (!msg || !currentUser) return;
       msgInput.value = "";
+
+      if(ISISAIHAH) {
+        return;
+      }
 
       if (msg.startsWith("/dm ")) {
         // format: /dm recipient message
