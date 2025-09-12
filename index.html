@@ -262,9 +262,13 @@
         ISISAIHAH = true
       }
 
-      if(document.visibilityState === "visible") {
-        document.title = "Chat";
+      function ISOPEN() {
+        if(document.visibilityState === "visible") {
+          document.title = "Chat";
+        }
       }
+
+      setInterval(ISOPEN, 5000);
     
       refreshDM();
     
