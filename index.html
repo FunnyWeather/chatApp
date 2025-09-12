@@ -75,7 +75,7 @@
       
     #chat {
         width: 100%;
-        max-width: 500px;
+        max-width: 800px;
         background-color: #1b2a47; /* Same as input */
         border-radius: 10px;
         padding: 10px;
@@ -193,8 +193,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    let ISISAIHAH = false;
-
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logout");
     const userDiv = document.getElementById("userDiv");
@@ -242,6 +240,7 @@
         }
       }
     };
+    
     let chatUnsub = null;
     let privateUnsub = null;
     let hasSeenMessage = true;
@@ -256,10 +255,6 @@
     
       if (currentUser === "Admin") {
         ISADMIN = true;
-      }
-
-      if(currentUser === "Isaiah.") {
-        ISISAIHAH = true
       }
 
       function ISOPEN() {
