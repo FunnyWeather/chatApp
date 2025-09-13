@@ -209,6 +209,7 @@
     const topText = document.getElementById("top-text")
 
     let currentUser = null;
+    let currentRole = null;
     let ISADMIN = false;
     // Login / Register
     loginBtn.onclick = async () => {
@@ -227,6 +228,7 @@
         // Register new user
         await addDoc(usersRef, { username, password, role: "user"});
         //statusDiv.innerText = "Registered and logged in!";
+        currentRole = "user";
         currentUser = username;
         enableChat();
       } else {
@@ -234,6 +236,7 @@
         const userDoc = snapshot.docs[0];
         if (userDoc.data().password === password) {
           //statusDiv.innerText = "Logged in!";
+          currentRole = userDoc.data().role;
           currentUser = username;
           enableChat();
         } else {
@@ -254,7 +257,7 @@
       loginBtn.style.display = "none";
       topText.textContent = "";
     
-      if (currentUser === "Admin") {
+      if (currentRole === "Admin") {
         ISADMIN = true;
       }
 
@@ -264,7 +267,7 @@
         }
       }
 
-      setInterval(ISOPEN, 500);
+      setInterval(ISOPEN, 100);
     
       refreshDM();
     
@@ -376,24 +379,6 @@
       }
     };
 
-    async function refreshMessages() {
-        const chatQuery = query(collection(db, "messages"), orderBy("time"));
-        const snapshot = await getDocs(chatQuery);
-
-        chatDiv.innerHTML = "";
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            const time = new Date(data.time).toLocaleTimeString(); // format timestamp
-
-            chatDiv.innerHTML += `
-            <div id="msg-${doc.id}" style="margin: 5px; padding: 8px; border-radius: 5px; background-color: #555;" class="chat-message">
-                <b>${data.user} | </b> <span style="font-size: 0.8em; color: #ccc;">${time} ${deleteButton}</span><br>
-                ${data.message}<br>
-            </div>
-            `;
-        });
-    }
-
     async function refreshDM() {
         const chatQuery = query(collection(db, "private messages"), orderBy("time"));
         const snapshot = await getDocs(chatQuery);
@@ -403,11 +388,11 @@
             const data = doc.data();
             const time = new Date(data.time).toLocaleTimeString(); // format timestamp
 
-            const deleteButton = (currentUser === "Admin") 
+            const deleteButton = (ISADMIN) 
                 ? `<button onclick="deleteDM('${doc.id}')">Delete</button>` 
                 : "";
 
-            if(currentUser === data.recipient || currentUser === data.user || currentUser === "Admin") { // or user is admin, show
+            if(currentUser === data.recipient || currentUser === data.user || ISADMIN) { // or user is admin, show
                 privateChat.innerHTML += `
                 <div style="margin: 5px; padding: 8px; border-radius: 5px; background-color: #555;">
                     <b>${data.user} --> ${data.recipient} | </b> <span style="font-size: 0.8em; color: #ccc;">${time} ${deleteButton}</span><br>
