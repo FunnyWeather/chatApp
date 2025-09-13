@@ -133,17 +133,26 @@
     #maurice {
       position: absolute;
       top: 0px;
-      left: 0px;
+      left: 50vw;
       width: auto;
       height: 50px;
     }
     
     #gabriel {
       position: absolute;
-      top: 150px;
-      left: 0px;
+      top: 50px;
+      left: 50vw;
       width: auto;
       height: 50px;
+    }
+
+    #terminal {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 500px;
+      height: 1000px;
+      background-color: #222222;
     }
     </style>
 
@@ -171,7 +180,9 @@
       <div id="privateMessages"></div>
     </div>
 
-    <button onclick="deleteAll('messages')"> delete all </button>
+    <div id="terminal>
+      <input id="command">
+    </div>
 
     <img src="download (9).jpeg" alt="no maurice" id="maurice"></img>
     <img src="gabriel.jpeg" alt="no daddy" id="gabriel"></img>
