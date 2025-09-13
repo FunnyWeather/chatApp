@@ -442,7 +442,7 @@
         }
     };
 
-    async function deleteAll(collectionName) {
+    window.deleteAll = async (collectionName) => {
       try {
         const colRef = collection(db, collectionName);
         const snapshot = await getDocs(colRef);
