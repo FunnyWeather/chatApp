@@ -379,54 +379,6 @@
       }
     };
 
-
-    /* Listen for messages
-    const chatQuery = query(collection(db, "messages"), orderBy("time"));
-    onSnapshot(chatQuery, snapshot => {
-        snapshot.docChanges().forEach(change => {
-            const data = change.doc.data();
-            const time = new Date(data.time).toLocaleTimeString();
-
-            const deleteButton = (data.user === currentUser || ISADMIN) 
-                ? `<button onclick="deleteMessage('${change.doc.id}')">Delete</button>` 
-                : "";
-
-            if (change.type === "added") {
-                chatDiv.innerHTML += `
-                <div id="msg-${change.doc.id}" style="margin: 5px; padding: 8px; border-radius: 5px; background-color: #555;" class="chat-message">
-                    <b>${data.user} | </b> <span style="font-size: 0.8em; color: #ccc;">${time} ${deleteButton}</span><br>
-                    ${data.message}<br>
-                </div>
-                `;
-            } else if (change.type === "removed") {
-                const msgDiv = document.getElementById(`msg-${change.doc.id}`);
-                if (msgDiv) msgDiv.remove();
-            }
-        });
-    });
-
-    const privateQuery = query(collection(db, "private messages"), orderBy("time"));
-    onSnapshot(privateQuery, snapshot => {
-        privateChat.innerHTML = "";
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            const time = new Date(data.time).toLocaleTimeString(); // format timestamp
-
-            const deleteButton = (ISADMIN)
-                ? `<button onclick="deleteDM('${doc.id}')">Delete</button>` 
-                : "";
-
-              if(currentUser === data.recipient || currentUser === data.user || currentUser === "Admin") { // or user is admin, show
-                  privateChat.innerHTML += `
-                  <div style="margin: 5px; padding: 8px; border-radius: 5px; background-color: #555;">
-                      <b>${data.user} --> ${data.recipient} | </b> <span style="font-size: 0.8em; color: #ccc;">${time} ${deleteButton}</span><br>
-                      ${data.message}<br>
-                  </div>
-                  `;
-              }
-        });
-    });*/
-
     async function refreshMessages() {
         const chatQuery = query(collection(db, "messages"), orderBy("time"));
         const snapshot = await getDocs(chatQuery);
@@ -492,6 +444,25 @@
             await deleteDoc(docRef);
         }
     };
+
+    async function deleteAll(collectionName) {
+      try {
+        const colRef = collection(db, collectionName);
+        const snapshot = await getDocs(colRef);
+    
+        if (snapshot.empty) {
+          console.log(`No documents found in '${collectionName}'`);
+          return;
+        }
+    
+        const deletePromises = snapshot.docs.map((d) => deleteDoc(doc(db, collectionName, d.id)));
+        await Promise.all(deletePromises);
+    
+        console.log(`Deleted ${snapshot.size} documents from '${collectionName}'`);
+      } catch (err) {
+        console.error("Error deleting documents: ", err);
+      }
+    }
 
     window.deleteDM = async (id) => {
         const docRef = doc(db, "private messages", id);
