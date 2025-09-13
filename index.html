@@ -207,7 +207,6 @@
     const topText = document.getElementById("top-text")
 
     let currentUser = null;
-    let ISADMIN = false;
 
     // Login / Register
     loginBtn.onclick = async () => {
@@ -347,10 +346,6 @@
       const msg = msgInput.value.trim();
       if (!msg || !currentUser) return;
       msgInput.value = "";
-
-      if(ISISAIHAH) {
-        return;
-      }
 
       if (msg.startsWith("/dm ")) {
         // format: /dm recipient message
