@@ -225,7 +225,7 @@
 
       if (snapshot.empty) {
         // Register new user
-        await addDoc(usersRef, { username, password, "user"});
+        await addDoc(usersRef, { username, password, role: "user"});
         //statusDiv.innerText = "Registered and logged in!";
         currentUser = username;
         enableChat();
