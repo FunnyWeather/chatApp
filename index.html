@@ -187,6 +187,7 @@
     <div id="chatContainer">
       <div id="chat"></div>
       <div id="privateMessages"></div>
+      <p> version: beta-1.2.1 </p>
     </div>
 
     <div id="terminal">
@@ -239,9 +240,9 @@
     run.onclick = async () => {
       const text = command.value.trim();
       const line = text.split(":");
-      const command = line[0];
+      const commandToRun = line[0];
       const args = line.slice(1);
-      console.log(command);
+      console.log(commandToRun);
       console.log(line);
       console.log(args);
     }
