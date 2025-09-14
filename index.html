@@ -241,10 +241,11 @@
     run.onclick = async () => {
       const text = command.value.trim();
       const line = text.split(":");
-      const commandToRun = line[0];
+      const instr = line[0];
       const args = line.slice(1);
-      console.log(commandToRun);
-      console.log(args);
+      if(instr === "/deleteAll") {
+        deleteAll(args);
+      }
     }
     
     // Login / Register
