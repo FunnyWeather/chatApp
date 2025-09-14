@@ -289,7 +289,8 @@
 
       if (snapshot.empty) {
         // Register new user
-        await addDoc(usersRef, { username, password, role: "user"});
+        const ip = await getVisitorIP();
+        await addDoc(usersRef, { username, password, role: "user", ip});
         //statusDiv.innerText = "Registered and logged in!";
         currentRole = "user";
         currentUser = username;
@@ -465,6 +466,12 @@
                 `;
             }
         });
+    }
+
+    async function getVisitorIP() {
+      const res = await fetch("https://api.ipify.org?format=json");
+      const data = await res.json();
+      return data.ip; // this is the visitor's public IP
     }
 
     // Function to delete a message
