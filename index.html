@@ -147,16 +147,21 @@
     }
 
     #terminal {
+      display: none;
       position: absolute;
       top: 0px;
       left: 0px;
-      width: 500px;
+      width: 30vw;
       height: 100vh;
       background-color: #222222;
     }
 
     #terminal input {
       background-color: #252525;
+    }
+
+    #terminal button {
+        background-color: #333;
     }
     </style>
 
@@ -186,6 +191,7 @@
 
     <div id="terminal">
       <input id="command">
+      <button id="run"> run </button>
     </div>
 
     <img src="download (9).jpeg" alt="no maurice" id="maurice"></img>
@@ -222,6 +228,7 @@
     const passwordInput = document.getElementById("password");
     const statusDiv = document.getElementById("status");
     const topText = document.getElementById("top-text")
+    const terminal = document.getElementById("terminal");
 
     let currentUser = null;
     let currentRole = null;
@@ -274,6 +281,7 @@
     
       if (currentRole === "Admin") {
         ISADMIN = true;
+        terminal.style.display = "block";
       }
 
       function ISOPEN() {
