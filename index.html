@@ -229,10 +229,23 @@
     const statusDiv = document.getElementById("status");
     const topText = document.getElementById("top-text")
     const terminal = document.getElementById("terminal");
+    const command = document.getElementById("command");
+    const run = document.getElementById("run");
 
     let currentUser = null;
     let currentRole = null;
     let ISADMIN = false;
+
+    run.onclick = async () => {
+      const text = command.value.trim();
+      const line = text.split(":");
+      const command = line[0];
+      const args = line.slice(1);
+      console.log(command);
+      console.log(line);
+      console.log(args);
+    }
+    
     // Login / Register
     loginBtn.onclick = async () => {
       const username = usernameInput.value.trim();
