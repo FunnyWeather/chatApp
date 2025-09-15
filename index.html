@@ -296,7 +296,7 @@
       }
 
       const usersRef = collection(db, "users");
-      const q = query(usersRef, where("username", "==", username));
+      let q = query(usersRef, where("username", "==", username));
       const snapshot = await getDocs(q);
 
       if (snapshot.empty) {
