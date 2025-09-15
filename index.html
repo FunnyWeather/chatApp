@@ -305,8 +305,14 @@
     async function triggerRefresh() {
       const refreshRef = doc(db, "triggers", "refresh");
       await updateDoc(refreshRef, {
-        value: increment(1);
+        value: 1;
       });
+
+      setTimeout(function () {
+        await updateDoc(refreshRef, {
+          value: 0;
+        })
+      }, 20000);
     }
     
     // Login / Register
