@@ -202,7 +202,7 @@
   <script type="module">
     import { doc, deleteDoc, getDoc} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, updateDoc, arrayUnion } 
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, updateDoc, arrayUnion, increment } 
       from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -305,7 +305,7 @@
     async function triggerRefresh() {
       const refreshRef = doc(db, "triggers", "refresh");
       await updateDoc(refreshRef, {
-        value: firebase.firestore.FieldValue.increment(1)
+        value: increment(1);
       });
     }
     
