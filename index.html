@@ -297,7 +297,7 @@
       }
     }
 
-    async function chatChange(const val) {
+    async function chatChange(val) {
       const CanChat = doc(db, "triggers", "chat");
       await updateDoc(CanChat, { value: val });
     }
