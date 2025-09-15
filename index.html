@@ -237,6 +237,8 @@
     let currentUser = null;
     let currentRole = null;
     let ISADMIN = false;
+
+    let canChat = false;
     
     const refreshRef = doc(db, "triggers", "refresh");
     
@@ -246,6 +248,20 @@
         if (data.value === 1) {
           console.log("Global refresh triggered!");
           location.reload(); // force reload
+        }
+      }
+    });
+
+    const chatRef = doc(db, "triggers", "chat");
+    
+    onSnapshot(chatRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.value === 1) {
+          canChat = true;
+        }
+        if (data.value === 0) {
+          canChat = false;
         }
       }
     });
@@ -274,6 +290,16 @@
           ban(ip);
         }
       }
+
+      if(instr === "/chat") {
+        const val = args[0];
+        chatChange(val)
+      }
+    }
+
+    async function chatChange(const val) {
+      const CanChat = doc(db, "triggers", "chat");
+      await updateDoc(CanChat, { value: val });
     }
 
     async function triggerRefresh() {
@@ -352,6 +378,7 @@
     let hasSeenMessage = true;
 
     function enableChat() {
+      const CanChat = doc(db, "triggers", "chat");
       userDiv.style.display = "block";
       userNameSpan.textContent = "Logged in as: " + currentUser;
       usernameInput.style.display = "none";
@@ -363,6 +390,8 @@
         ISADMIN = true;
         terminal.style.display = "block";
       }
+
+      canChat = Boolean(CanChat.value);
 
       function ISOPEN() {
         if(document.visibilityState === "visible") {
@@ -454,6 +483,10 @@
       const msg = msgInput.value.trim();
       if (!msg || !currentUser) return;
       msgInput.value = "";
+
+      if(!canChat) {
+        return;
+      }
 
       if (msg.startsWith("/dm ")) {
         // format: /dm recipient message
