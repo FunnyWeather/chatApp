@@ -300,7 +300,8 @@ Unknown command:
         } else if (command === "?control") {
           if (args[0] === "ban") {
             const userCollection = collection(db, "users")
-            const q = query(userCollection, where("username","==",args[1]))
+            const userString = args.slice(1).join(" ");
+            const q = query(userCollection, where("username","==",userString))
             const qSnap = await getDocs(q)
 
             if (!qSnap.empty) {
@@ -309,7 +310,8 @@ Unknown command:
             }
           } else if (args[0] === "unban") {
             const userCollection = collection(db, "users")
-            const q = query(userCollection, where("username","==",args[1]))
+            const userString = args.slice(1).join(" ");
+            const q = query(userCollection, where("username","==",userString))
             const qSnap = await getDocs(q)
 
             if (!qSnap.empty) {
@@ -349,4 +351,5 @@ Unknown command:
   </script>
 
 </body>
+
 </html>
