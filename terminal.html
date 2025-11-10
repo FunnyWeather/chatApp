@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Terminal</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: "Consolas", "Courier New", monospace;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      margin: 20px;
+    }
+
+    #terminal {
+      background-color: black;
+      width: 100vw;
+      height: 100vh;
+      padding: 10px;
+      border: 2px solid #333;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .line {
+      white-space: pre-wrap;
+    }
+
+    #inputLine {
+      display: flex;
+      gap: 5px;
+    }
+
+    #prompt {
+      color: rgb(187, 187, 187);
+    }
+
+    #commandLine {
+      background-color: black;
+      border: none;
+      color: white;
+      outline: none;
+      font-family: inherit;
+      font-size: inherit;
+      flex: 1;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #555;
+    }
+    ::-webkit-scrollbar-track {
+      background: #222;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="terminal">
+    <div id="output"></div>
+    <div id="inputLine">
+      <span id="prompt">=&gt;</span>
+      <input type="text" id="commandLine" autofocus>
+    </div>
+  </div>
+
+  <script type="module">
+    const HELP_TEXT = `
+FireCMD — Command Reference
+===========================
+
+?deleteAll <collection>
+    Deletes ALL documents from the specified collection.
+
+?utils chat <0|1>
+    Enables or disables chat globally.
+    0 = off, 1 = on
+
+?utils ref
+    Triggers a global refresh on all client pages.
+
+?utils set <collection> <document> {json} [merge]
+    Sets or merges a document.
+    merge: true|false
+    Example:
+        ?utils set triggers chat {"value":1} true
+
+?utils print <collection>
+    Prints all documents in a collection.
+    Format: id, {key:value,...}
+
+?utils broadcast <message>
+    Replaces the persistent broadcast message on the chat page.
+
+?utils announce <message>
+    Immediately alerts ALL connected clients with an alert() popup.
+
+?diag users
+    Shows the active user count (listeners trigger).
+
+?diag users recalibrate
+    Resets listener count to 0, then triggers refresh.
+
+?diag count <collection>
+    Shows number of documents in a collection.
+
+?control ban <username>
+    Finds the user and bans their IP.
+
+?control unban <username>
+    Removes the user's IP from the ban list.
+
+Unknown command:
+    If a command does not match any handler, FireCMD prints:
+    '<command>' is not recognized as a command
+`;
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      updateDoc,
+      collection,
+      getCountFromServer,
+      getDocs,
+      deleteDoc,
+      setDoc,
+      arrayUnion,
+      arrayRemove,
+      where,
+      query
+    } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyADuus9QP-KyaUd5SrY5IMP2_DZfNMbaDs",
+      authDomain: "chatdata-d1bb0.firebaseapp.com",
+      projectId: "chatdata-d1bb0",
+      storageBucket: "chatdata-d1bb0.firebasestorage.app",
+      messagingSenderId: "454474717430",
+      appId: "1:454474717430:web:588dee91a19bd72bc9b4d7",
+      measurementId: "G-0PQFE6PHVM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const consoleOutput = document.getElementById("output");
+    const commandInput = document.getElementById("commandLine");
+
+    const canChatRef = doc(db, "triggers", "chat");
+    const refreshRef = doc(db, "triggers", "refresh");
+    const listenersRef = doc(db, "triggers", "listeners");
+    const broadcastRef = doc(db, "broadcasts", "broadcast");
+    const announcementRef = doc(db, "broadcasts", "announcement");
+    const closeRef = doc(db, "triggers", "close");
+
+    async function canChatGet() {
+      const docSnap = await getDoc(canChatRef);
+      return docSnap.data().value;
+    }
+
+    async function getAllDocsFormatted(db, collectionName) {
+      const colRef = collection(db, collectionName);
+      const snapshot = await getDocs(colRef);
+
+      const list = [];
+      snapshot.forEach(docSnap => {
+        const id = docSnap.id;
+        const data = docSnap.data();
+        list.push(`${id}, ${JSON.stringify(data)}`);
+      });
+
+      return list;
+    }
+
+    async function getCollectionCount(collectionName) {
+      const colRef = collection(db, collectionName);
+      const snapshot = await getCountFromServer(colRef);
+      return snapshot.data().count;
+    }
+
+    async function deleteCollection(collectionName) {
+      const colRef = collection(db, collectionName);
+      const snapshot = await getDocs(colRef);
+
+      if (snapshot.empty) return 0;
+
+      const promises = [];
+      snapshot.forEach(docSnap => {
+        promises.push(deleteDoc(doc(db, collectionName, docSnap.id)));
+      });
+      await Promise.all(promises);
+      return snapshot.size;
+    }
+
+    async function banIP(ip) {
+      try {
+        const bannedRef = doc(db, "banned", "banned IP");
+        await updateDoc(bannedRef, {
+          ips: arrayUnion(ip)
+        });
+        printLine(`banned ip ${ip}`);
+      } catch (err) {
+        console.error("Error banning IP:", err);
+      }
+    }
+
+    async function unbanIP(ip) {
+      try {
+        const bannedRef = doc(db, "banned", "banned IP");
+
+        await updateDoc(bannedRef, {
+          ips: arrayRemove(ip)
+        });
+
+        printLine(`unbanned ip ${ip}`);
+      } catch (err) {
+        console.error("Error unbanning IP:", err);
+      }
+    }
+
+    function printLine(text) {
+      const line = document.createElement("div");
+      line.classList.add("line");
+      line.textContent = text;
+      consoleOutput.appendChild(line);
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+
+    async function runCommand(cmd) {
+      const tokens = cmd.trim().split(" ");
+      const command = tokens[0];
+      const args = tokens.slice(1);
+
+      printLine(`=> ${cmd}`);
+
+      try {
+        if (command === "?deleteAll") {
+          const count = await deleteCollection(args[0]);
+          printLine(`Deleted ${count} documents from ${args[0]}`);
+        } else if (command === "?utils") {
+          if (args[0] === "chat") {
+            await updateDoc(canChatRef, { value: args[1] });
+            printLine(`Updated chat trigger to ${args[1]}`);
+          } else if (args[0] === "ref") {
+            await updateDoc(refreshRef, { value: Date.now() });
+            printLine(`triggered global refresh`);
+          } else if (args[0] === "set") {
+            const setRef = doc(db, args[1], args[2]);
+
+            const jsonString = args.slice(3).join(" ");
+            const mergeFlag = args[4] === "true" || args[4] === "1";
+            
+            const data = JSON.parse(jsonString);
+            await setDoc(setRef, data, {merge: mergeFlag});
+
+            printLine(`changed document "${args[1]} -> ${args[2]}" to ${jsonString}`);
+          } else if (args[0] === "print") {
+            const documents = await getAllDocsFormatted(db, args[1])
+
+            documents.forEach(line => printLine(line));
+          } else if (args[0] === "broadcast") {
+            let words = args.slice(1);
+            let string = words.join(" ");
+
+            setDoc(broadcastRef, {message: string});
+            printLine(`broadcasted message ${string}`);
+          } else if (args[0] === "announce") {
+            let words = args.slice(1);
+            let string = words.join(" ");
+
+            setDoc(announcementRef, {message: string});
+            printLine(`announced message ${string}`);
+          }
+        } else if (command === "?diag") {
+          if (args[0] === "users") {
+            if (1 in args) {
+              if (args[1] === "recalibrate") {
+                const setRef = doc(db, "triggers", "listeners");
+                await setDoc(setRef, {value: 0});
+                await updateDoc(refreshRef, { value: Date.now() });
+
+                printLine("recalibrated user count.")
+              }
+            } else {
+              const docSnap = await getDoc(listenersRef);
+              const val = docSnap.data().value;
+              printLine(`Active users: ${val}`);
+            }
+          } else if (args[0] === "count") {
+            const count = await getCollectionCount(args[1]);
+            printLine(`Collection ${args[1]} count: ${count}`);
+          }
+        } else if (command === "?control") {
+          if (args[0] === "ban") {
+            const userCollection = collection(db, "users")
+            const q = query(userCollection, where("username","==",args[1]))
+            const qSnap = await getDocs(q)
+
+            if (!qSnap.empty) {
+              const userDoc = qSnap.docs[0];
+              banIP(userDoc.data().ip)
+            }
+          } else if (args[0] === "unban") {
+            const userCollection = collection(db, "users")
+            const q = query(userCollection, where("username","==",args[1]))
+            const qSnap = await getDocs(q)
+
+            if (!qSnap.empty) {
+              const userDoc = qSnap.docs[0];
+              unbanIP(userDoc.data().ip)
+            }
+          } else if (args[0] === "close") {
+            await updateDoc(closeRef, {value: Date.now()});
+          }
+        } else if (command === "?sys") {
+          printLine(`messages count ${await getCollectionCount("messages")}`);
+          const docSnap = await getDoc(listenersRef);
+          const val = docSnap.data().value;
+          printLine(`Active users: ${val}`);
+          printLine(`chat allowed: ${await canChatGet() === "1" ? "true" : "false"}`);
+        } else if (command === "?help") {
+          printLine(HELP_TEXT);
+        } else {
+          printLine(`'${command}' is not recognized as a command`);
+        }
+      } catch (err) {
+        printLine(`Error: ${err.message}`);
+      }
+
+      printLine("\n")
+    }
+
+    commandInput.addEventListener("keydown", async (e) => {
+      if (e.key === "Enter") {
+        const cmd = commandInput.value;
+        if (cmd.trim()) {
+          await runCommand(cmd);
+        }
+        commandInput.value = "";
+      }
+    });
+  </script>
+
+</body>
+</html>
