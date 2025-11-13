@@ -87,6 +87,11 @@
     const announcementRef = doc(db, "broadcasts", "announcement");
     const closeRef = doc(db, "triggers", "close");
 
+    function hasEmojis(str) {
+      const emojiRegex = /\p{Emoji}/u;
+      return emojiRegex.test(str);
+    }
+
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         document.title = "Chat";
@@ -197,7 +202,11 @@
         }
       }
 
-      await addDoc(usersRef, { username: u, password: p, ip: userIP });
+      if(!hasEmojis(u)) {
+        await addDoc(usersRef, { username: u, password: p, ip: userIP });
+      } else {
+        alert("emojis bad");
+      }
       accountName = u;
       loginBox.style.display = "none";
       chatUI.style.display = "block";
