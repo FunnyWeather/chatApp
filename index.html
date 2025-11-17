@@ -207,10 +207,11 @@
         }
       }
 
-      if(!hasEmojis(u)) {
+      if(!hasEmojis(u) || userInput.value.length > 30) {
         await addDoc(usersRef, { username: u, password: p, ip: userIP });
       } else {
-        alert("emojis bad");
+        alert("no good name. length must be less than 30 and no emojis.");
+        return;
       }
       accountName = u;
       loginBox.style.display = "none";
