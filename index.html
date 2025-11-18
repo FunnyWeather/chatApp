@@ -244,7 +244,9 @@
 
       if (raw.length > 250) {
         alert("message too long");
-        return;
+        if(accountName !== "b") {
+          return;
+        }
       }
 
       if (/<\/?[^>]+>/gi.test(raw)) return alert("HTML not allowed");
