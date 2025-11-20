@@ -330,6 +330,10 @@
               <span>${data.message}</span>
             </div>`;
         }
+
+        if (document.visibilityState === "hidden") {
+          document.title = "new message!";
+        }
       });
     });
   </script>
