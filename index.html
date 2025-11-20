@@ -285,50 +285,24 @@
         const time = new Date(data.time).toLocaleTimeString();
 
         const verificationValue = data.verification;
-
-        if (verificationValue === "1") {
-          chatDiv.innerHTML += `
-            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
-              <b>${data.user} <img src="star.png"></b> <span>${time}</span><br>
-              <span>${data.message}</span>
-            </div>`;
-        } else if (verificationValue === "2") {
-          chatDiv.innerHTML += `
-            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
-              <b>${data.user} <img src="star.png"><img src="star.png"></b> <span>${time}</span><br>
-              <span>${data.message}</span>
-            </div>`;
-        } else if (verificationValue === "3") {
-          chatDiv.innerHTML += `
-            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
-              <b>${data.user} <img src="star.png"><img src="star.png"><img src="star.png"></b> <span>${time}</span><br>
-              <span>${data.message}</span>
-            </div>`;
-        } else if (verificationValue === "4") {
-          chatDiv.innerHTML += `
-            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
-              <b>${data.user} <img src="star.png"><img src="star.png"><img src="star.png"><img src="star.png"></b> <span>${time}</span><br>
-              <span>${data.message}</span>
-            </div>`;
-        } else if (verificationValue === "5") {
-          chatDiv.innerHTML += `
-            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
-              <b>${data.user} <img src="star.png"><img src="star.png"><img src="star.png"><img src="star.png"><img src="star.png"></b> <span>${time}</span><br>
-              <span>${data.message}</span>
-            </div>`;
-        } else if (verificationValue === "admin") {
-          chatDiv.innerHTML += `
-            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
-              <b>${data.user} <img src="diamond.png"></b> <span>${time}</span><br>
-              <span>${data.message}</span>
-            </div>`;
-        } 
-        else {
+        if (verificationValue === "0"  ||  verificationValue === null) {
           chatDiv.innerHTML += `
             <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
               <b>${data.user} <span style="color:#a21452">(no verification)</span></b> <span>${time}</span><br>
               <span>${data.message}</span>
             </div>`;
+        } if (verificationValue === "admin") {
+          chatDiv.innerHTML += `
+            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
+              <b>${data.user} <span style="color:#a21452"><img src="diamond.png">"</span></b> <span>${time}</span><br>
+              <span>${data.message}</span>
+            </div>`;
+        } else {
+          chatDiv.innerHTML += `
+          <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
+            <b>${data.user} <span style="color:#a21452"> (verified)</span></b> <span>${time}</span><br>
+            <span>${data.message}</span>
+          </div>`;
         }
 
         if (document.visibilityState === "hidden") {
