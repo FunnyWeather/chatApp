@@ -92,10 +92,7 @@
     const announcementRef = doc(db, "broadcasts", "announcement");
     const closeRef = doc(db, "triggers", "close");
 
-    function hasEmojis(str) {
-      const emojiRegex = /\p{Emoji}/u;
-      return emojiRegex.test(str);
-    }
+    let verified = "";
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
@@ -198,6 +195,7 @@
         const userData = snap.docs[0].data();
         if (userData.password === p) {
           accountName = u;
+          verified = userData.verified;
           loginBox.style.display = "none";
           chatUI.style.display = "block";
           return;
@@ -207,10 +205,12 @@
         }
       }
 
-      if(!hasEmojis(u) || userInput.value.length > 30) {
-        await addDoc(usersRef, { username: u, password: p, ip: userIP });
+      if(userInput.value.length < 30) {
+        const baseVerification = "0";
+        await addDoc(usersRef, { username: u, password: p, ip: userIP, verified: baseVerification});
+        verified = baseVerification;
       } else {
-        alert("no good name. length must be less than 30 and no emojis.");
+        alert("name must be less than 30 characters long");
         return;
       }
       accountName = u;
@@ -253,7 +253,7 @@
       const forbidden = ["data:image/", "<img", ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", "base64,"];
       if (forbidden.some(p => raw.toLowerCase().includes(p))) return alert("Images not allowed");
 
-      await addDoc(collection(db, "messages"), { user: accountName, message: raw, time: Date.now() });
+      await addDoc(collection(db, "messages"), { user: accountName, message: raw, time: Date.now(), verification: verified });
       msgInput.value = "";
       charCount.textContent = MAX_CHARS; // reset
     };
@@ -263,16 +263,47 @@
       chatDiv.innerHTML = "";
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
-        const line = document.createElement("div");
-        const userSpan = document.createElement("b");
-        userSpan.textContent = data.user + ": ";
-        const msgSpan = document.createElement("span");
-        msgSpan.textContent = data.message;
-        line.appendChild(userSpan);
-        line.appendChild(msgSpan);
-        chatDiv.appendChild(line);
-        if (document.visibilityState === "hidden") {
-          document.title = "new message";
+        const time = new Date(data.time).toLocaleTimeString();
+
+        const verificationValue = data.verification;
+
+        if (verificationValue === "1") {
+          chatDiv.innerHTML += `
+            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
+              <b>${data.user} <img src="star.png"></b> <span>${time}</span><br>
+              <span>${data.message}</span>
+            </div>`;
+        } else if (verificationValue === "2") {
+          chatDiv.innerHTML += `
+            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
+              <b>${data.user} <img src="star.png"><img src="star.png"></b> <span>${time}</span><br>
+              <span>${data.message}</span>
+            </div>`;
+        } else if (verificationValue === "3") {
+          chatDiv.innerHTML += `
+            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
+              <b>${data.user} <img src="star.png"><img src="star.png"><img src="star.png"></b> <span>${time}</span><br>
+              <span>${data.message}</span>
+            </div>`;
+        } else if (verificationValue === "4") {
+          chatDiv.innerHTML += `
+            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
+              <b>${data.user} <img src="star.png"><img src="star.png"><img src="star.png"><img src="star.png"></b> <span>${time}</span><br>
+              <span>${data.message}</span>
+            </div>`;
+        } else if (verificationValue === "5") {
+          chatDiv.innerHTML += `
+            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
+              <b>${data.user} <img src="star.png"><img src="star.png"><img src="star.png"><img src="star.png"><img src="star.png"></b> <span>${time}</span><br>
+              <span>${data.message}</span>
+            </div>`;
+        } 
+        else {
+          chatDiv.innerHTML += `
+            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
+              <b>${data.user} <span style="color:#a21452">(no verification)</span></b> <span>${time}</span><br>
+              <span>${data.message}</span>
+            </div>`;
         }
       });
     });
