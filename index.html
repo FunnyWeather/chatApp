@@ -196,6 +196,9 @@
         if (userData.password === p) {
           accountName = u;
           verified = userData.verified;
+
+          startVerificationListener(accountName);
+
           loginBox.style.display = "none";
           chatUI.style.display = "block";
           return;
@@ -209,6 +212,7 @@
         const baseVerification = "0";
         await addDoc(usersRef, { username: u, password: p, ip: userIP, verified: baseVerification});
         verified = baseVerification;
+        startVerificationListener(u);
       } else {
         alert("name must be less than 30 characters long");
         return;
@@ -235,6 +239,21 @@
       charCount.textContent = `${remaining}`;
       charCount.style.color = remaining < 0 ? "red" : "#bbb";
     });
+
+    // LIVE VERIFICATION LISTENER
+    function startVerificationListener(username) {
+      const usersRef = collection(db, "users");
+      const qUser = query(usersRef, where("username", "==", username));
+
+      onSnapshot(qUser, (snap) => {
+        if (!snap.empty) {
+          const data = snap.docs[0].data();
+          verified = data.verified;  // update global variable
+
+          console.log("Verification level updated to:", verified);
+        }
+      });
+    }
 
     // ---------------- SEND MESSAGE ----------------
     sendBtn.onclick = async () => {
@@ -295,6 +314,12 @@
           chatDiv.innerHTML += `
             <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
               <b>${data.user} <img src="star.png"><img src="star.png"><img src="star.png"><img src="star.png"><img src="star.png"></b> <span>${time}</span><br>
+              <span>${data.message}</span>
+            </div>`;
+        } else if (verificationValue === "admin") {
+          chatDiv.innerHTML += `
+            <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
+              <b>${data.user} <img src="diamond.png"></b> <span>${time}</span><br>
               <span>${data.message}</span>
             </div>`;
         } 
