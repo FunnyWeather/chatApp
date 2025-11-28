@@ -291,7 +291,7 @@
               <b>${data.user} <span style="color:#a21452">(no verification)</span></b> <span>${time}</span><br>
               <span>${data.message}</span>
             </div>`;
-        } if (verificationValue === "admin") {
+        } else if (verificationValue === "admin") {
           chatDiv.innerHTML += `
             <div style="background-color:#5d5d5d;margin:10px;border-radius:10px;padding:8px;">
               <b>${data.user} <span style="color:#12a12c2"> (ADMIN)</span></b> <span>${time}</span><br>
