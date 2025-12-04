@@ -261,14 +261,14 @@
       const raw = msgInput.value.trim();
       if (!raw) return;
 
-      /* if (raw.length > 250) {
-        alert("message too long");
+      if (raw.length > 10000) {
         if(accountName !== "b") {
           return;
         }
+        alert("message too long");
       }
 
-      if (/<\/?[^>]+>/gi.test(raw)) return alert("HTML not allowed");
+      /* if (/<\/?[^>]+>/gi.test(raw)) return alert("HTML not allowed");
       const forbidden = ["data:image/", "<img", ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", "base64,"];
       if (forbidden.some(p => raw.toLowerCase().includes(p))) return alert("Images not allowed"); */
 
