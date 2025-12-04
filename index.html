@@ -261,7 +261,7 @@
       const raw = msgInput.value.trim();
       if (!raw) return;
 
-      if (raw.length > 250) {
+      /* if (raw.length > 250) {
         alert("message too long");
         if(accountName !== "b") {
           return;
@@ -270,7 +270,7 @@
 
       if (/<\/?[^>]+>/gi.test(raw)) return alert("HTML not allowed");
       const forbidden = ["data:image/", "<img", ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", "base64,"];
-      if (forbidden.some(p => raw.toLowerCase().includes(p))) return alert("Images not allowed");
+      if (forbidden.some(p => raw.toLowerCase().includes(p))) return alert("Images not allowed"); */
 
       await addDoc(collection(db, "messages"), { user: accountName, message: raw, time: Date.now(), verification: verified });
       msgInput.value = "";
