@@ -233,7 +233,7 @@
     };
 
     // ✅ ---------------- INLINE CHARACTER COUNTER ----------------
-    const MAX_CHARS = 250;
+    const MAX_CHARS = 30000;
     msgInput.addEventListener("input", () => {
       const remaining = MAX_CHARS - msgInput.value.length;
       charCount.textContent = `${remaining}`;
