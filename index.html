@@ -233,7 +233,7 @@
     };
 
     // ✅ ---------------- INLINE CHARACTER COUNTER ----------------
-    const MAX_CHARS = 30000;
+    const MAX_CHARS = 250;
     msgInput.addEventListener("input", () => {
       const remaining = MAX_CHARS - msgInput.value.length;
       charCount.textContent = `${remaining}`;
@@ -261,7 +261,7 @@
       const raw = msgInput.value.trim();
       if (!raw) return;
 
-      if (raw.length > 30000) {
+      if (raw.length > MAX_CHARS) {
         if(accountName !== "b") {
           return;
         }
